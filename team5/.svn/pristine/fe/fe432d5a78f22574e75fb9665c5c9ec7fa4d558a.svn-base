@@ -1,0 +1,64 @@
+package budget;
+
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.Vector;
+
+import javax.swing.JButton;
+
+public class Category {
+	String categoryName;
+	BigDecimal estimate;
+	boolean incomeCategory;
+	
+	//Default constructor
+	Category() {
+		categoryName = "Place Name Here";
+		estimate = new BigDecimal(0.00);
+		incomeCategory = true;
+	}//End default constructor
+	
+	//Value added constructor
+	Category(String n, double e, boolean i) {
+		//!!No data validation
+		categoryName = n;
+		estimate = new BigDecimal(e);
+		incomeCategory = i;
+	}
+	
+	//accessors for variables.
+	String getCategoryName() {
+		return categoryName;
+	}//End accessor for category name.
+	
+	BigDecimal getEstimate() {
+		return estimate;
+	}//End accessor for estimate.
+	
+	boolean getIncomeOrExpense() {
+		return incomeCategory;
+	}//End accessor for incomeCategory.
+	
+	//Basic mutators, starting out with no data validation
+	void setName(String n) {
+		categoryName = n;
+	}//End mutator for categoryName.
+	
+	void setEstimate(BigDecimal e) {
+		estimate = e;
+	}//End mutator for estimate.
+	
+	void setIncomeCategory(boolean i) {
+		incomeCategory = i;
+	}//End mutator for IncomeCategory.
+	
+	Vector<Object> getVector() {
+		Vector<Object> data = new Vector<Object>();
+		data.add(getCategoryName());
+		data.add(NumberFormat.getCurrencyInstance().format(getEstimate()));
+		data.add(0);
+		data.add(0);
+		data.add(new JButton("remove"));
+		return data;
+	}
+}

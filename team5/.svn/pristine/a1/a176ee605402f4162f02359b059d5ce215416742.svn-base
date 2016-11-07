@@ -1,0 +1,42 @@
+package budget;
+
+import java.math.BigDecimal;
+
+public class Category {
+	String categoryName;
+	BigDecimal estimate;
+	boolean incomeCategory;
+	
+	//Default constructor
+	Category() {
+		categoryName = "TestName";
+		estimate = new BigDecimal(100.55);
+		incomeCategory = true;
+	}//End default constructor
+	
+	//accessors for variables.
+	String getCategoryName() {
+		return categoryName;
+	}//End accessor for category name.
+	
+	BigDecimal getEstimate() {
+		return estimate;
+	}//End accessor for estimate.
+	
+	boolean getIncomeOrExpense() {
+		return incomeCategory;
+	}//End accessor for incomeCategory.
+	
+	//Basic mutators, starting out with no data validation
+	void setName(String n) {
+		categoryName = n;
+	}//End mutator for categoryName.
+	
+	void setEstimate(BigDecimal e) {
+		estimate = e;
+	}//End mutator for estimate.
+	
+	void setIncomeCategory(boolean i) {
+		incomeCategory = i;
+	}//End mutator for IncomeCategory.
+}

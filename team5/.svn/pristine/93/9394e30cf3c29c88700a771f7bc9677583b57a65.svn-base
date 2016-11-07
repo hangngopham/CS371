@@ -1,0 +1,32 @@
+package budget;
+
+public class testRow {
+	public static void main(String args[]) {
+		//Declare and make an instance of a row.
+		Row test = new Row();
+		//Transaction neg = new Transaction(1800);
+		
+		//Test all the accessors + the to-string.
+		System.out.println(test);
+		
+		//Test mutators.
+		test.setTitle("Rent");
+		test.setEstimate(1800);
+		test.addTransaction(500);
+		
+		System.out.println(test);
+		
+		//Make diff go negative
+		test.addTransaction(1800);
+		System.out.println(test);
+		
+		//add one more transaction, then remove the one that went negative (transaction 2)
+		test.addTransaction(500);
+		System.out.println(test);
+		//We need a handle on that transaction to remove it.
+		//test.removeTransaction(neg);
+		//We should now have possitive value in difference.
+		System.out.println(test);
+		//Works like a charm. All tests done.
+	}//End main.
+}//End class.

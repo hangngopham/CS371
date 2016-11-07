@@ -1,0 +1,29 @@
+<html>
+   <head><link rel="shortcut icon" type="image/jpg" href ="/minions.jpg"/></head>
+
+   <body>
+
+      <h3>Hello World</h3>
+      
+      <p><cs371>Welcome to CS371</cs371></p>
+      
+      <p>jpg
+         <img src = "minions.jpg"/>
+       </p>
+
+       <p>jpeg
+         <img src = "images.jpeg"/>
+       </p>
+
+       <p>png
+         <img src = "Goofy_hq.png"/>
+       </p>
+
+       <p>gif
+         <img src = "giphy_s.gif"/>
+       </p>
+
+      <p><cs371date></p>
+      <p><cs371server></p>
+</body>
+</html>

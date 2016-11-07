@@ -1,0 +1,77 @@
+package budget;
+
+import java.util.Date;
+import java.util.ArrayDeque;
+
+public class Budget {
+	//All our instance variables.
+	private String name;
+	private Category categoryTotals;
+	private Category incomeTotals;
+	private Category expenseTotals;
+	private ArrayDeque<Category> incomeCategories;
+	private ArrayDeque<Category> expenseCategories;
+	private Date inDate;
+	private BudgetTableModel model;
+	
+	//Default constructor.
+	public Budget() {
+		//Just get everything setup, print to terminal that things were setup.
+		setName("\"\"'s Budget");
+		System.out.println("Budget name set at \"\"'s Budget");
+		categoryTotals = new Category("Totals", 0, true);
+		incomeTotals = new Category("Income Totals", 0, true);
+		expenseTotals = new Category("Expense Totals", 0, false);
+		incomeCategories = new ArrayDeque<Category>();
+		expenseCategories = new ArrayDeque<Category>();
+		inDate = new Date();
+		model = new BudgetTableModel();
+		setupModel();
+		model.addRow(incomeTotals.getVector());
+		model.addRow(expenseTotals.getVector());
+		model.addRow(categoryTotals.getVector());
+	}//End default constructor.
+	
+	//Accessors
+	//Accessor for name
+	public String getName() {
+		return name;
+	}//End getName.
+	//Attempted accessor for model
+	public BudgetTableModel getModel() {
+		return model;
+	}//End BudgetTableModel
+	//--Other accessors here.
+	//End accessors.
+	
+	//Mutators
+	public void setName(String n) {
+		//No data validation needed.  Don't care what they name it.
+		name = n;
+	}//End setName.
+	//--Other mutators here.
+	//End mutators.
+	
+	//Special functions
+	//setupModel sets up the basis for the table.
+	public void setupModel() {
+		model.addColumn("Name");
+		model.addColumn("Estimate");
+		model.addColumn("Actual");
+		model.addColumn("Difference");
+		model.addColumn("Type");
+	}//End setupModel.
+	//Add an income category<default>
+	public void addIncome() {
+		incomeCategories.addLast(new Category());
+		model.addRow(incomeCategories.peekLast().getVector());
+		model.moveRow(model.getRowCount() - 1, model.getRowCount() - 1, incomeCategories.size() -1);
+	}//End addIncome
+	//Add an expense category<default>
+	public void addExpense() {
+		expenseCategories.addLast(new Category());
+		model.addRow(expenseCategories.peekLast().getVector());
+		//Just a bit more of a complicated shift.
+		model.moveRow(model.getRowCount() - 1, model.getRowCount() -1, incomeCategories.size() + expenseCategories.size());
+	}
+}//End class

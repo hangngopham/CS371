@@ -1,0 +1,540 @@
+package budget;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.math.BigDecimal;
+import java.util.ArrayDeque;
+import java.util.Calendar;
+
+/**
+ * This Object houses all the data members and functions that a budget needs to be functional and useful. 
+ */
+public class Budget {
+	/**
+	 * The name of the budget is a friendly name.  If the user inputs "John" the name should be: "John's budget".
+	 */
+	private String name;
+	/**
+	 * This Category object is a totals row in the main budget window to be treated as such, a child of Category should 
+	 * be made with functions to convert Category objects into a simple stack of rows.
+	 */
+	//private Category categoryTotals;
+	private Row categoryTotals;
+	/**
+	 * The implementation of this is the same as categoryTotals.
+	 */
+	//private Category incomeTotals;
+	private Row incomeTotals;
+	/**
+	 * The implementation of this is the same as categoryTotals.
+	 */
+	//private Category expenseTotals;
+	private Row expenseTotals;
+	/**
+	 * An ArrayDeque object filled with all categories that are primarily income.
+	 */
+	private ArrayDeque<Category> incomeCategories;
+	/**
+	 * An ArrayDeque object filled with all categories that are primarily expense.
+	 */
+	private ArrayDeque<Category> expenseCategories;
+	/**
+	 * The original date of creation for the budget, does not change when loading a budget.
+	 */
+	private Calendar inDate;
+	/**
+	 * This model can be loaded into the main gui's table, it houses data from all the Categories.
+	 */
+	private BudgetTableModel model;
+	private int day;
+	private int month;
+	private int year;
+	
+	/**
+	 * Default constructor: Does basic setup functionality to a default setting.
+	 */
+	public Budget() {
+		//Just get everything setup, print to terminal that things were setup.
+		setName("\"Edit name's\" Budget");
+		System.out.println("Budget name set to \"\"'s Budget");
+		
+		categoryTotals = new Row("Totals");
+		incomeTotals = new Row("Income Totals");
+		expenseTotals = new Row("Expense Totals");
+		System.out.println("All totals cleared for new budget.");
+		
+		incomeCategories = new ArrayDeque<Category>();
+		expenseCategories = new ArrayDeque<Category>();
+		System.out.println("New lists of accounts created.");
+		
+		setDate();
+		System.out.println("Origin date set.");
+		
+		setupModel();
+		model.addRow(incomeTotals.getVector());
+		model.addRow(expenseTotals.getVector());
+		model.addRow(categoryTotals.getVector());
+		System.out.println("Table model created and formatted.");
+		
+		System.out.println("Budget creation complete!");
+	}//End default constructor.
+	
+	/**
+	 * This constructor will build a budget based off the input from a file selected by the user.
+	 */
+	public void load(File toLoad) {
+		//!!MAP!!
+		//1 - String
+		//2 - int
+		//3 - Row
+		//4 - Category
+		//5 - Transaction
+		//6 - BigDecimal
+		//7 - End of income categories
+		//Load a new budget first, we will then modify if the file is good.
+		//super();
+		clone(new Budget());
+		//Unverified file is the expected input.
+		byte identifier [] = new byte[1];
+		int status;
+		try {
+			FileInputStream reader = new FileInputStream(toLoad);
+			
+			//Now for the difficult part of loading a new budget.
+			//Trash the first identifier, since it's just telling us it's a string.
+			reader.read(identifier);
+			
+			//Load the name now.
+			setName(readString(reader));
+			
+			//We also know the next identifier is a 3 for categoryTotals
+			//reader.read(identifier);
+			
+			//Now read in the categoryTotals row.
+			//readRow(reader, categoryTotals);
+			
+			//Let's pull in the first value and see what it is, it will be an identifier first will be a category.
+			status = readCategory(reader, incomeCategories.peekLast());
+			while(reader.available() > 0 && status != 7) {
+				incomeCategories.addLast(new Category());
+				status = readCategory(reader, incomeCategories.peekLast());
+			}
+			while(reader.available() > 0) 
+			{
+				//TODO read in the expense accounts.
+			}
+			reader.close();
+		}
+		catch (Exception e) {
+			System.out.println("File: " + toLoad + " not found!");
+			System.out.println("Budget creation from file failed!");
+			return;
+		}
+		
+	}//End file load.
+	
+	private int readCategory(FileInputStream file, Category toLoad) {
+		int status = 0;
+		try {
+			//TODO Finish adding the code to read a category..!!
+		}
+		catch(Exception e) {
+			System.out.println("Error while reading category!");
+		}
+		return status;
+	}
+
+	private void readRow(FileInputStream file, Row toLoad) {
+		try {
+			//We will first be reading in the name, throw the identifier.
+			file.skip(1);
+			toLoad.setTitle(readString(file));
+			//Now check the identifier for BigDecimal
+			file.skip(2);
+			toLoad.setEstimate(readString(file));
+		}
+		catch(Exception e) {
+			System.out.println("Error reading row!");
+		}
+	}
+	
+	private String readString(FileInputStream file) {
+		short len;
+		byte lenBytes[] = new byte[2];
+		byte stringStream[];
+		try {
+			file.read(lenBytes);
+			len = (short) (((lenBytes[0]&0xFF)<<8) | (lenBytes[1]&0xFF));
+			stringStream = new byte[len];
+			file.read(stringStream);
+			String toReturn = new String(stringStream);
+			System.out.println(toReturn);
+			return toReturn;
+		}
+		catch(Exception e) {
+			System.out.println("Error reading string in!");
+		}
+		//shouldn't reach this unless there's an error...
+		return "Error!!";
+	}
+	
+	//Accessors
+	/**
+	 * Returns a String.  This is a public method because the user will see the name of the budget.
+	 * @return The name of the budget.
+	 */
+	public String getName() {
+		System.out.println("Budget name requested and returned");
+		return name;
+	}//End getName.
+	
+	/**
+	 * This function returns the model outlining the budget for a table object. 
+	 * @return The model that represents this Budget object.
+	 */
+	public BudgetTableModel getModel() {
+		System.out.println("Budget model requested and returned");
+		return model;
+	}//End BudgetTableModel
+	
+	/**
+	 * This function returns the date the budget was created.  Used in-class to help format the name of the budget.
+	 * @return The date the Budget object was first created.
+	 */
+	private Calendar getInDate() {
+		System.out.println("Date requested and returned");
+		return inDate;
+	}//End getInDate();
+	
+	//--Other accessors here.
+	//End accessors.
+	
+	//Mutators
+	/**
+	 * This function sets the name of the budget.  The argument is taken and modified to match style "name"'s budget - creation date.
+	 * @param n The user specified portion of the budget name.
+	 */
+	public void setName(String n) {
+		//No data validation needed.  Don't care what they name it.
+		name = n;
+		System.out.println("Budget name set to: " + name);
+	}//End setName.
+	
+	/**
+	 * This function is used to set the date when reading the budget in from a file.
+	 */
+	//!! Unused function. Change for when loading in a budget.
+	private void setDate() {
+		inDate = Calendar.getInstance();
+		day = Calendar.DAY_OF_MONTH;
+		System.out.println(day);
+		month = Calendar.MONTH;
+		System.out.println(month);
+		year = Calendar.YEAR;
+		System.out.println(year);
+		System.out.println("Date set as: " + inDate);
+	}//End setDate
+	
+	//--Other mutators here.
+	//End mutators.
+	
+	//Special functions
+	/**
+	 * Blank setup for a BudgetTableModel.
+	 */
+	public void setupModel() {
+		model = new BudgetTableModel();
+		model.addColumn("Name");
+		model.addColumn("Estimate");
+		model.addColumn("Actual");
+		model.addColumn("Difference");
+	}//End setupModel
+	
+	/**
+	 * Add a Category named with the input String n to the incomeCategories ArrayDeque. 
+	 * @param n The name of the new Category to add to the ArrayDeque.
+	 */
+	public void addIncome(String n) {
+		incomeCategories.addLast(new Category(n));
+		model.addRow(incomeCategories.peekLast().getVector());
+		model.moveRow(model.getRowCount() - 1, model.getRowCount() - 1, incomeCategories.size() -1);
+		System.out.println("New income category added: " + incomeCategories.peekLast());
+	}//End addIncome
+	
+	/**
+	 * Add a Category named with the input String n to the expenseCategories ArrayDeque.
+	 * @param n The name of the new Category to add to the ArrayDeque.
+	 */
+	public void addExpense(String n) {
+		expenseCategories.addLast(new Category(n));
+		model.addRow(expenseCategories.peekLast().getVector());
+		//Just a bit more of a complicated shift.
+		model.moveRow(model.getRowCount() - 1, model.getRowCount() -1, incomeCategories.size() + expenseCategories.size());
+		System.out.println("New Expense category added: " + expenseCategories.peekLast());
+	}//End addExpense
+	
+	/**
+	 * Remove a Category object the Budget object and remove it from the table the index i comes in from a JList index
+	 * Formatted {"Budget", [Titles of all incomeCategories], [Titles of all expenseCategories]}.
+	 * @param i the index i comes in from a JList index formatted {"Budget", [Titles of all incomeCategories], [Titles of all expenseCategories]}
+	 * by the function getCategories.
+	 */
+	public void removeCategory(int i) {
+		Category toRemove = getCategoryIndex(i);
+		int target;
+		
+		if(i <= incomeCategories.size()) {
+			incomeCategories.removeFirstOccurrence(toRemove);
+			target = i -1;
+		}
+		else {
+			expenseCategories.removeFirstOccurrence(toRemove);
+			target = incomeCategories.size() + i;
+		}
+		
+		model.removeRow(target); 
+		model.fireTableDataChanged();
+		//This will use i as the index of an income category to remove.
+	}//End removeCategory
+	
+	/**
+	 * Dumps the old budget values and copies to another budget.  This is a very dirty method. 
+	 * !!Change this so that maybe we aren't passing Budget's around outside this class!!
+	 * @param n a Budget object to clone to.
+	 */
+	public void clone(Budget n) {
+		this.name = n.getName();
+		//Make this use accessors to be cleaner.
+		this.incomeCategories = n.incomeCategories;
+		this.expenseCategories = n.expenseCategories;
+		this.inDate = n.getInDate();
+		this.model = n.getModel();
+		/*
+		 * calcAllTotals();
+		 */
+		model.fireTableDataChanged();
+	}//End clone
+	
+	/**
+	 * This function builds an Object array based on the current state of the Budget. 
+	 * @return an object array filled such that: {"Budget", [Titles from all income Categories], [Titles from all expense Categories]}
+	 */
+	public Object[] categoryNames() {
+		//Array is the size of our 3 basic cattegories + all others.
+		//Commented out section adds Income Totals and Expense Totals + their calculations
+		Object nameList[] = new Object[1+incomeCategories.size()+expenseCategories.size()];
+		
+		nameList[0] = "Budget";
+		
+		for(int i = 0; i < incomeCategories.size(); i++)
+			nameList[1 + i] = incomeCategories.toArray()[i];
+		
+		for(int i = 0; i < expenseCategories.size(); i++)
+			nameList[1 + incomeCategories.size() + i] = expenseCategories.toArray()[i];
+		
+		model.fireTableDataChanged();
+		
+		System.out.println("Category list updated.");
+		return nameList;
+	}//End categoryNames
+	
+	/**
+	 * Given a target index from a JList of the format {"Budget", [Titles from all income Categories], [Titles from all expense Categories]},
+	 * This function will return the Category from the correct ArrayDeque.
+	 * !!This function should be private to reduce coupling potential.!!
+	 * @param target This integer is the target index from an array of Objects that corresponds to a specific Category.
+	 * @return       The Category specified by the target index.
+	 */
+	private Category getCategoryIndex(int target) {
+		Category toReturn = new Category();
+
+		if(target > 0 && incomeCategories.isEmpty() == false && target <= incomeCategories.size()) {
+			toReturn = (Category) incomeCategories.toArray()[target - 1];
+		}
+		else if(incomeCategories.isEmpty() == true)
+			toReturn = (Category) expenseCategories.toArray()[target - 1];
+		else
+			toReturn = (Category) expenseCategories.toArray()[target - incomeCategories.size() - 1];
+		
+		System.out.println("Returning Category: " + toReturn);
+		
+		return toReturn;
+	}//End getCategoryNamed
+	
+	/**
+	 * This function is multi-step.  The first action it performs is to go through each Category and tell it to update it's table,
+	 * it then updates it's own table based on these updates.
+	 */
+	public void changedData() {
+		//Check for and make changes.
+		for(int i = 0; i < incomeCategories.size(); i++)
+			((Category)incomeCategories.toArray()[i]).changedData();
+		for(int i = 0; i < expenseCategories.size(); i++)
+			((Category)expenseCategories.toArray()[i]).changedData();
+		calcIncomeTotals();
+		calcExpenseTotals();
+		calcTotalTotals();
+		//Everything has checked its data for updates and recalculated as needed.
+		
+		//Affect the changes in the budget itself.
+		setupModel();
+		for(int i = 0; i < incomeCategories.size(); i++)
+			model.addRow(((Category)incomeCategories.toArray()[i]).getVector());
+		model.addRow(incomeTotals.getVector());
+		for(int i = 0; i < expenseCategories.size();i++)
+			model.addRow(((Category)expenseCategories.toArray()[i]).getVector());
+		model.addRow(expenseTotals.getVector());
+		model.addRow(categoryTotals.getVector());
+		//Budget re-built with changes.
+		
+		//Tell the model to update.
+		model.fireTableDataChanged();
+	}//End changedData
+	
+	public void calcIncomeTotals() {
+		incomeTotals = new Row("Income Totals");
+		BigDecimal sum = new BigDecimal(0.0);
+		BigDecimal sum1 = new BigDecimal(0.0);
+		for(int i = 0; i < incomeCategories.size(); i++) {
+			sum = sum.add(((Category)incomeCategories.toArray()[i]).getEstimate());
+			sum1 = sum1.add(((Category)incomeCategories.toArray()[i]).getActual());
+		}//End for.
+		incomeTotals.setEstimate(sum.doubleValue());
+		incomeTotals.addTransaction(sum1.doubleValue());
+	}
+	
+	public void calcExpenseTotals() {
+		expenseTotals = new Row("Expense Totals");
+		BigDecimal sum = new BigDecimal(0.0);
+		BigDecimal sum1 = new BigDecimal(0.0);
+		for(int i = 0; i < expenseCategories.size(); i++) {
+			sum = sum.add(((Category)expenseCategories.toArray()[i]).getEstimate());
+			sum1 = sum1.add(((Category)expenseCategories.toArray()[i]).getActual());
+		}//End for.
+		expenseTotals.setEstimate(sum.doubleValue());
+		expenseTotals.addTransaction(sum1.doubleValue());
+	}
+	
+	public void calcTotalTotals() {
+		categoryTotals = new Row("Totals");
+		BigDecimal sum = new BigDecimal(0.0);
+		sum = incomeTotals.getEstimate().subtract(expenseTotals.getEstimate());
+		categoryTotals.setEstimate(sum.doubleValue());
+		sum = new BigDecimal(0.0);
+		sum = incomeTotals.getActual().subtract(expenseTotals.getEstimate());
+		categoryTotals.addTransaction(sum.doubleValue());
+	}
+	
+	public void changeRowEstimate(int category, int row, double e) {
+		getCategoryIndex(category).changeRowEstimate(row, e);
+		changedData();
+	}
+	
+	public void addRowTransaction(int category, int row, double e) {
+		getCategoryIndex(category).addRowTransaction(row, e);
+		changedData();
+	}
+	
+	public CategoryTableModel getCategoryModel(int i) {
+		return getCategoryIndex(i).getModel();
+	}
+	
+	public void addCategoryRow(int i, String title) {
+		getCategoryIndex(i).addRow(title);
+	}
+	
+	/**
+	 * This function will save the currently loaded Budget into a file specified by the input String.
+	 * @param saveTo Is the name of the file we would like to save into.
+	 */
+	public void saveBudget(File saveTo) {
+		FileOutputStream saver;
+		try {
+			//!!MAP!!
+			//1 - String
+			//2 - int
+			//3 - Row
+			//4 - Category
+			//5 - Transaction
+			//6 - BigDecimal
+			//7 - End of income categories
+			saver = new FileOutputStream(saveTo);
+			//Write the Budget name to the file.
+			writeStringToFile(saver, getName());
+			
+			//Write the date to the file in multiple parts - Day, Month, Year
+			//writeIntToFile(saver, day);
+			//writeIntToFile(saver, month);
+			//writeIntToFile(saver, year);
+			
+			//Write The CategoryTotals Row to the file
+			//writeRowToFile(saver, categoryTotals);
+			//Write the incomeTotals Row to the file
+			//writeRowToFile(saver, incomeTotals);
+			//Write the expense Row to the file
+			//writeRowToFile(saver, expenseTotals);
+			//Write all the income categories to the file.
+			for(int i = 0; i < incomeCategories.toArray().length; i++) {
+				writeCategoryToFile(saver, ((Category)incomeCategories.toArray()[i]));
+			}
+			//Write all the expense categories to the file.
+			for(int i = 0; i < expenseCategories.toArray().length; i++) {
+				writeCategoryToFile(saver, ((Category)expenseCategories.toArray()[i]));
+			}
+			saver.close();
+		}
+		catch(Exception e) {
+			System.out.println("Unable to work on file: " + saveTo + " for saving! Operation failed!");
+			return;
+		}
+	}
+	
+	private void writeCategoryToFile(FileOutputStream file, Category category) {
+		Row rowsToWrite [];
+		try {
+			file.write(4);
+			writeStringToFile(file, category.getCategoryName());
+			rowsToWrite = category.returnRows();
+			for(int i = 0; i < rowsToWrite.length; i++)
+				writeRowToFile(file, rowsToWrite[i]);
+		}
+		catch(Exception e) {
+			System.out.println("Error writing category to file!");
+		}
+	}
+
+	private void writeStringToFile(FileOutputStream file, String toWrite) {
+		try {
+			file.write(1);
+			byte stringStream[] = toWrite.getBytes();
+			short size = (short) stringStream.length;
+			//If size < 255, it only writes one byte, this is a quick hack >.>
+			if(size < 255)
+				file.write(0);
+			file.write(size);
+			file.write(stringStream);
+		}
+		catch(Exception e) {
+			System.out.println("Error writing String!");
+		}
+	}
+	
+	private void writeRowToFile(FileOutputStream file, Row toWrite) {
+		String transactions [];
+		try {
+			file.write(3);
+			writeStringToFile(file, toWrite.getTitle());
+			file.write(6);
+			writeStringToFile(file, toWrite.getEstimate().toString());
+			transactions = toWrite.getTransactionVals();
+			for(int i = 0; i < transactions.length; i++) {
+				file.write(6);
+				writeStringToFile(file, transactions[i]);
+			}
+		}
+		catch(Exception e) {
+			System.out.println("Error writing row to file!");
+		}
+	}
+}//End class

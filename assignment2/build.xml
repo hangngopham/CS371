@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Web Server" default="compile" basedir=".">
+
+<target name ="clean">
+<delete dir = "build"/>
+</target>
+
+<target name="compile" depends="clean">
+<javac srcdir="./" destdir="./"/>
+</target>
+
+<target name="run" depends="compile">
+</target>
+
+</project>
+

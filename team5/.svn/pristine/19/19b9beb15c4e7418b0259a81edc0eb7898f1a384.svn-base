@@ -1,0 +1,8 @@
+package budget;
+
+import javax.swing.table.DefaultTableModel;
+
+public class BudgetTableModel extends DefaultTableModel {
+	private static final long serialVersionUID = 7527476991768121958L;
+	
+}

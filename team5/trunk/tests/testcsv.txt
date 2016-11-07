@@ -1,0 +1,12 @@
+expense,food,wing stop,20
+income,work,paycheck,150
+expense,house,electricity,50
+expense,groceries,walmart,100
+income,other,side,200
+income,work,lawnmowing,50
+expense,house,gas,70
+income,work,babysitting,50
+expense,food,mcdonalds,7
+expense,house,water,50
+expense,food,panda express,9
+income,work,proctoring,30

@@ -1,0 +1,15 @@
+1. IglooScore1.java:
+
+overallScore(): 
+In order to calculate the total score, we need to sum the two highest scores and omit the lowest one. Hence, in this method. I compare score1, score2 and set s to the smaller score. Then I compare s (which is score1/score2) with score3 and set s to the smaller score. In the original file, I find there are two errors in overallScore() method:
+- When score1 < score2, it should set s = score1 (not s = score2 in the original file). In the else statement, it should set s = score2 (not s = score1 in the original file)
+
+2. IglooScore2.java:
+
+overallScore():
+To calculate the total scores, we need to sum the two highest scores and omit the lowest one. Therefore, this method finds the lowest score and sums the two highest scores. In the original file, I find some erros in overallScore() method:
+- When score3 is the lowest score value, we need to set 2 highest scores as: s1 = score1 and s2 = score2
+- If all scores are the same, we set s1 = score1 and s2 = score2 (not s1 = 99 and s2 = 99 in the original file)
+
+main(String args[]):
+We don't need (args == null) since the condition (args.length != 3) has already covered all cases for invalid number of arguments entered (0,1,2,>3). In my file, I omit the condition (args==null).

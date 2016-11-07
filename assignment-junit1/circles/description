@@ -1,0 +1,39 @@
+In this assignment, I have identified the following errors:
+
+1) Circle.java
+- In scale method, there is an error in changing the redius. Radius should be multiplied by factor to get the desired result (according to the comment) instead of adding factor to radius.
+- In moveBy method, when modifying value of y, we should add yOffset to center.y, instead of xOffset.
+
+2) Circle1.java
+The intersects method does not work correctly.
+
+- Assume we have two circles:
+ + Circle 1: center O(x1,y1) and radius r1
+ + Circle 2: center O'(x2,y2) and radius r2
+ + Let d = OO' = distance between two centers
+
+- There are four cases of intersection of two circles:
++ Case 1: The two circles intersect in two points if d > |r1-r2| and d < |r1+r2|
++ Case 2: The two circles touch internally at one point if d = |r1-r2|
++ Case 3: The two circles touch externally if d = r1 + r2
++ Case 4: Two circles do not intersect at all: one circle lies completely inside the other if d < |r1-r2| and one circle lies completely outside the other if d > r1 + r2
+
+- Based on these information, I modify the intersects method with if else statements
+
+3) Circle2.java
+- The constructor is not correct. I will reverse the position of x and y. The body of the constructor should be super(x,y,radius) instead of super(y,x,radius)
+- The intersects method does not work correctly. 
+- Assume we have two circles:
+ + Circle 1: center O(x1,y1) and radius r1
+ + Circle 2: center O'(x2,y2) and radius r2
+ + Let d = OO' = distance between two centers
+
+- There are four cases of intersection of two circles:
++ Case 1: The two circles intersect in two points if d > |r1-r2| and d < |r1+r2|
++ Case 2: The two circles touch internally at one point if d = |r1-r2|
++ Case 3: The two circles touch externally if d = r1 + r2
++ Case 4: Two circles do not intersect at all: one circle lies completely inside the other if d < |r1-r2| and one circle lies completely outside the other if d > r1 + r2
+
+- Based on these information, I modify the intersects method with if else statements
+
+Sources: http://www.ilovemaths.com/3twocircles.asp

@@ -1,0 +1,256 @@
+package budget;
+
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+public class GuiMain extends JFrame {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -205935214689282413L;
+	private JPanel contentPane;
+
+	/**
+	 * Launch the application.
+	 * @param args An array of String arguments.  Currently unused.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					GuiMain frame = new GuiMain();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create window and all elements.
+	 */
+	public GuiMain() {
+		//Set up the Budget
+		Budget main = new Budget();
+		
+		//All frames
+		JSplitPane splitPane = new JSplitPane();
+		splitPane.setResizeWeight(.40);
+		JList<Object> list = new JList<Object>(main.categoryNames());
+		//model is contained in the Budget main.
+		JTable table = new JTable(main.getModel());
+		JScrollPane scrollPane = new JScrollPane(table);
+		
+		//Build the list listener
+		ListSelectionListener sel = new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				if(e.getValueIsAdjusting() == false) {
+					//Change the table model to the corresponding model
+					if(list.getSelectedIndex() == -1) {
+						//DO NOTHING.
+					}
+					else if(list.getSelectedIndex() == 0)
+						table.setModel(main.getModel());
+					else {
+						//main.
+						table.setModel(main.getCategoryModel(list.getSelectedIndex()));
+					}
+				}//End if.
+			}//End valueChanged.
+		};
+		list.addListSelectionListener(sel);
+		
+		//Build the window
+		this.setTitle("Budget Manager " + main.getName());
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(50, 50, 900, 800);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(new BorderLayout(0, 0));
+		contentPane.add(splitPane, BorderLayout.CENTER);
+		splitPane.setLeftComponent(list);
+		splitPane.setRightComponent(scrollPane);
+		
+		//Setup the menu system
+		JMenuBar menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+		
+		JMenu mnNewMenu = new JMenu("File");
+		menuBar.add(mnNewMenu);
+		
+		JMenuItem mntmNewMenuItem = new JMenuItem("New Budget");
+		mntmNewMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Budget newB = new Budget();
+				main.clone(newB);
+				table.setModel(main.getModel());
+				list.setListData(main.categoryNames());
+				System.out.println("New budget loaded.");
+			}
+		});
+		mnNewMenu.add(mntmNewMenuItem);
+		
+		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Save Budget");
+		mnNewMenu.add(mntmNewMenuItem_1);
+		mntmNewMenuItem_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SaveFile(main);
+			}
+		});
+		
+		JMenuItem mntmNewMenuItem_2 = new JMenuItem("Load Budget");
+		mnNewMenu.add(mntmNewMenuItem_2);
+		mntmNewMenuItem_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				LoadFile(main);
+				main.changedData();
+				table.setModel(main.getModel());
+				setTitle("Budget Manager " + main.getName());
+			}
+		});
+		
+		JMenuItem mntmNewMenuItem_3 = new JMenuItem("Exit");
+		mntmNewMenuItem_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+		mnNewMenu.add(mntmNewMenuItem_3);
+		
+		JMenu mnNewMenu_1 = new JMenu("Add");
+		menuBar.add(mnNewMenu_1);
+		
+		JMenuItem mntmCategoryMenuItem = new JMenuItem("Income Category");
+		mnNewMenu_1.add(mntmCategoryMenuItem);
+		mntmCategoryMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String check = JOptionPane.showInputDialog("Input a new category name.");
+				if(check!=null)
+					main.addIncome(check);
+				list.setListData(main.categoryNames());
+			}
+		});
+		
+		JMenuItem mntmAddMenuItem = new JMenuItem("Expense Category");
+		mnNewMenu_1.add(mntmAddMenuItem);
+		mntmAddMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String check = JOptionPane.showInputDialog("Input a new category name.");
+				if(check!=null)
+					main.addExpense(check);
+				list.setListData(main.categoryNames());
+				
+			}
+		});
+		
+		JMenuItem mntmAddRowMenuItem = new JMenuItem("Row");
+		mnNewMenu_1.add(mntmAddRowMenuItem);
+		mntmAddRowMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String check = JOptionPane.showInputDialog("Input a new row name.");
+				if(check!=null)
+				{
+					if(list.getSelectedIndex() != -1 || list.getSelectedIndex() != 0)
+						main.addCategoryRow(list.getSelectedIndex(), check);
+				}
+			}
+		});
+		
+		JMenuItem mntmTransactionem = new JMenuItem("Transaction");
+		mnNewMenu_1.add(mntmTransactionem);
+		mntmTransactionem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String check = JOptionPane.showInputDialog("Input a new transaction amount.");
+				if(check!=null)
+				{
+					if(list.getSelectedIndex() != -1 && list.getSelectedIndex() != 0)
+						if(table.getSelectedRow() != -1 && table.getSelectedRow() != 0) {
+							main.addRowTransaction(list.getSelectedIndex(), table.getSelectedRow(), Double.parseDouble(check));
+							table.setModel(main.getCategoryModel(list.getSelectedIndex()));
+						}
+				}
+			}
+		});
+		
+		JMenuItem editEstimateItem = new JMenuItem("Estimate");
+		mnNewMenu_1.add(editEstimateItem);
+		editEstimateItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String check = JOptionPane.showInputDialog("Input a new transaction amount.");
+				if(check!=null)
+				{
+					if(list.getSelectedIndex() != -1 && list.getSelectedIndex() != 0)
+						if(table.getSelectedRow() != -1 && table.getSelectedRow() != 0) {
+							main.changeRowEstimate(list.getSelectedIndex(), table.getSelectedRow(), Double.parseDouble(check));
+							table.setModel(main.getCategoryModel(list.getSelectedIndex()));
+						}
+				}
+			}
+		});
+		
+		JMenu removeMenu = new JMenu("Remove");
+		menuBar.add(removeMenu);
+		
+		JMenuItem removeCategory = new JMenuItem("Remove Category");
+		removeMenu.add(removeCategory);
+		removeCategory.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {		
+				if(list.getSelectedIndex() != 0 && list.getSelectedIndex() != -1) {
+					main.removeCategory(list.getSelectedIndex());
+					list.setListData(main.categoryNames());
+					table.setModel(main.getModel());
+				}
+			}
+		});
+		
+		
+		
+	}
+	public void LoadFile(Budget b){
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+		int result = fileChooser.showOpenDialog(this);
+		if (result == JFileChooser.APPROVE_OPTION) {
+		    File selectedFile = fileChooser.getSelectedFile();
+		    if(selectedFile != null) {
+		    	System.out.println("Selected file: " + selectedFile.getAbsolutePath());
+		    	b.load(selectedFile);
+				System.out.println("New file loaded.");
+		    }
+		}
+	}
+	public void SaveFile(Budget b){
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+		int result = fileChooser.showOpenDialog(this);
+		if (result == JFileChooser.APPROVE_OPTION) {
+		    File selectedFile = fileChooser.getSelectedFile();
+		    if(selectedFile != null) {
+		    	System.out.println("Selected file: " + selectedFile.getAbsolutePath());
+		    	b.saveBudget(selectedFile);
+				System.out.println("File saved.");
+		    }
+		}
+	}
+}
